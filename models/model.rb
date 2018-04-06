@@ -13,3 +13,7 @@ end
 class UpdatePrepaid < ActiveRecord::Base
   self.table_name = "update_prepaid"
 end
+
+class UpdatePrepaidConfig < ActiveRecord::Base
+  self.table_name =  "update_prepaid_config"
+end

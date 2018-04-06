@@ -29,6 +29,23 @@ module FixThreeMonths
 
           end
 
+
+        def load_table_update_prepaid_config
+            UpdatePrepaidConfig.delete_all
+            ActiveRecord::Base.connection.reset_pk_sequence!('update_prepaid_config')
+
+            CSV.foreach('update_prepaid_config.csv', :encoding => 'ISO-8859-1', :headers => true) do |row|
+                # puts row.inspect
+                title = row['title']
+                product_id = row['product_id']
+                variant_id = row['variant_id']
+                product_collection = row['product_collection']
+                new_update_prepaid_config = UpdatePrepaidConfig.new(title: title, product_id: product_id, variant_id: variant_id, product_collection: product_collection)
+                new_update_prepaid_config.save
+              end
+            
+        end
+
         def setup_update_prepaid_table
             UpdatePrepaid.delete_all
             ActiveRecord::Base.connection.reset_pk_sequence!('update_prepaid')
@@ -101,7 +118,9 @@ module FixThreeMonths
             my_line_items = myorder.line_items[0]['properties']
 
             found_collection = false
-            my_product_collection = 'Desert Sage - 5 Item'
+            #my_product_collection = 'Desert Sage - 5 Item'
+            config_data = UpdatePrepaidConfig.first
+            my_product_collection = config_data.product_collection
 
             my_line_items.map do |mystuff|
                 # puts "#{key}, #{value}"
@@ -141,7 +160,7 @@ module FixThreeMonths
 #"subscription_id": 11957808,
 #"title": "testing discount  Auto renew",
             my_order_id = myorder.order_id
-            my_data = { "line_items" => [ { "properties" => my_line_items, "product_id" => 197983830034, "variant_id" => 1788451618834, "quantity" => 1, "title" => "Desert Sage - 5 Item"}]}
+            my_data = { "line_items" => [ { "properties" => my_line_items, "product_id" => config_data.product_id.to_i, "variant_id" => config_data.variant_id.to_i, "quantity" => 1, "title" => config_data.title}]}
 
             puts "Now here is what we are sending to Recharge"
             puts my_data.inspect

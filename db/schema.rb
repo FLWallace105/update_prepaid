@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180404185813) do
+ActiveRecord::Schema.define(version: 20180406163309) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -434,6 +434,13 @@ ActiveRecord::Schema.define(version: 20180404185813) do
     t.boolean "is_updated", default: false
     t.datetime "updated_at"
     t.text "properties"
+  end
+
+  create_table "update_prepaid_config", force: :cascade do |t|
+    t.string "title"
+    t.string "product_id"
+    t.string "variant_id"
+    t.string "product_collection"
   end
 
   create_table "update_products", force: :cascade do |t|
