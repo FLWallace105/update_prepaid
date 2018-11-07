@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180406163309) do
+ActiveRecord::Schema.define(version: 20181023162058) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -28,6 +28,67 @@ ActiveRecord::Schema.define(version: 20180406163309) do
     t.string "subscription_id"
     t.boolean "updated", default: false
     t.datetime "updated_at"
+  end
+
+  create_table "bad_prices", force: :cascade do |t|
+    t.string "bad_product_title"
+    t.string "bad_shopify_product_id"
+    t.string "bad_price"
+    t.string "good_product_title"
+    t.string "good_shopify_product_id"
+    t.string "good_shopify_variant_id"
+    t.string "good_sku"
+    t.string "good_product_collection"
+  end
+
+  create_table "bad_recurring_subs", force: :cascade do |t|
+    t.string "subscription_id"
+    t.string "customer_id"
+    t.datetime "next_charge_scheduled_at"
+    t.decimal "price", precision: 10, scale: 2
+    t.string "status"
+    t.string "product_title"
+    t.string "product_id"
+    t.string "variant_id"
+    t.string "sku"
+    t.jsonb "line_item_properties"
+    t.boolean "updated", default: false
+    t.datetime "updated_at"
+    t.integer "expire_after_specific_number_charges"
+  end
+
+  create_table "bad_subs", id: false, force: :cascade do |t|
+    t.serial "id", null: false
+    t.bigint "customer_id"
+    t.string "first_name", limit: 125
+    t.string "last_name", limit: 125
+    t.string "email", limit: 125
+  end
+
+  create_table "bad_switches", force: :cascade do |t|
+    t.string "subscription_id"
+    t.string "address_id"
+    t.string "customer_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.datetime "next_charge_scheduled_at"
+    t.datetime "cancelled_at"
+    t.string "product_title"
+    t.decimal "price", precision: 10, scale: 2
+    t.integer "quantity"
+    t.string "status"
+    t.string "shopify_product_id"
+    t.string "shopify_variant_id"
+    t.string "sku"
+    t.string "order_interval_unit"
+    t.integer "order_interval_frequency"
+    t.integer "charge_interval_frequency"
+    t.integer "order_day_of_month"
+    t.integer "order_day_of_week"
+    t.jsonb "raw_line_item_properties"
+    t.datetime "synced_at"
+    t.integer "expire_after_specific_number_charges"
+    t.boolean "is_updated", default: false
   end
 
   create_table "charge_billing_address", force: :cascade do |t|
@@ -146,6 +207,13 @@ ActiveRecord::Schema.define(version: 20180406163309) do
     t.datetime "updated_at", default: -> { "now()" }, null: false
   end
 
+  create_table "correct_prices", force: :cascade do |t|
+    t.string "product_name"
+    t.string "shopify_product_id"
+    t.decimal "good_price", precision: 10, scale: 2
+    t.string "product_collection"
+  end
+
   create_table "current_products", force: :cascade do |t|
     t.string "prod_id_key"
     t.string "prod_id_value"
@@ -182,8 +250,52 @@ ActiveRecord::Schema.define(version: 20180406163309) do
     t.string "processor_type"
     t.string "status"
     t.datetime "synced_at"
+    t.index ["customer_id"], name: "cust_constraint", unique: true
     t.index ["customer_id"], name: "index_customers_on_customer_id"
     t.index ["shopify_customer_id"], name: "index_customers_on_shopify_customer_id"
+  end
+
+  create_table "ellie_bottle_orders", force: :cascade do |t|
+    t.string "email"
+    t.string "first_name"
+    t.string "last_name"
+    t.string "address1"
+    t.string "address2"
+    t.string "city"
+    t.string "zip"
+    t.string "province"
+    t.string "province_code"
+    t.string "country"
+    t.string "country_code"
+    t.string "phone"
+    t.bigint "shopify_customer_id"
+    t.bigint "shopify_address_id"
+    t.boolean "order_sent", default: false
+    t.datetime "order_date"
+  end
+
+  create_table "fix_bad_sub_properties", force: :cascade do |t|
+    t.string "subscription_id"
+    t.jsonb "raw_line_item_properties"
+    t.jsonb "new_line_item_properties"
+    t.boolean "updateable", default: false
+    t.boolean "is_updated", default: false
+    t.datetime "updated_at"
+  end
+
+  create_table "fix_three_months", force: :cascade do |t|
+    t.string "subscription_id"
+    t.string "customer_id"
+    t.datetime "next_charge_scheduled_at"
+    t.decimal "price", precision: 10, scale: 2
+    t.string "status"
+    t.string "product_title"
+    t.string "product_id"
+    t.string "variant_id"
+    t.string "sku"
+    t.jsonb "line_item_properties"
+    t.boolean "updated", default: false
+    t.datetime "updated_at"
   end
 
   create_table "matching_products", force: :cascade do |t|
@@ -214,6 +326,7 @@ ActiveRecord::Schema.define(version: 20180406163309) do
     t.string "company"
     t.string "phone"
     t.index ["order_id"], name: "index_order_billing_address_on_order_id"
+    t.index ["order_id"], name: "ord_bill", unique: true
   end
 
   create_table "order_line_items_fixed", force: :cascade do |t|
@@ -226,6 +339,7 @@ ActiveRecord::Schema.define(version: 20180406163309) do
     t.string "shopify_product_id"
     t.string "product_title"
     t.index ["order_id"], name: "index_order_line_items_fixed_on_order_id"
+    t.index ["order_id"], name: "ord_fixed", unique: true
     t.index ["subscription_id"], name: "index_order_line_items_fixed_on_subscription_id"
   end
 
@@ -249,6 +363,7 @@ ActiveRecord::Schema.define(version: 20180406163309) do
     t.string "company"
     t.string "phone"
     t.index ["order_id"], name: "index_order_shipping_address_on_order_id"
+    t.index ["order_id"], name: "ord_ship", unique: true
   end
 
   create_table "orders", force: :cascade do |t|
@@ -285,10 +400,18 @@ ActiveRecord::Schema.define(version: 20180406163309) do
     t.index ["charge_id"], name: "index_orders_on_charge_id"
     t.index ["customer_id"], name: "index_orders_on_customer_id"
     t.index ["order_id"], name: "index_orders_on_order_id"
+    t.index ["order_id"], name: "ord_id", unique: true
     t.index ["shopify_id"], name: "index_orders_on_shopify_id"
     t.index ["shopify_order_id"], name: "index_orders_on_shopify_order_id"
     t.index ["shopify_order_number"], name: "index_orders_on_shopify_order_number"
     t.index ["transaction_id"], name: "index_orders_on_transaction_id"
+  end
+
+  create_table "pending_people", id: false, force: :cascade do |t|
+    t.serial "id", null: false
+    t.string "first_name", limit: 125
+    t.string "last_name", limit: 125
+    t.string "email", limit: 125
   end
 
   create_table "product_tags", force: :cascade do |t|
@@ -401,6 +524,7 @@ ActiveRecord::Schema.define(version: 20180406163309) do
     t.index ["customer_id"], name: "index_subscriptions_on_customer_id"
     t.index ["expire_after_specific_number_charges"], name: "index_subscriptions_on_expire_after_specific_number_charges"
     t.index ["subscription_id"], name: "index_subscriptions_on_subscription_id"
+    t.index ["subscription_id"], name: "sub_id", unique: true
   end
 
   create_table "subscriptions_updated", force: :cascade do |t|
@@ -427,13 +551,35 @@ ActiveRecord::Schema.define(version: 20180406163309) do
   end
 
   create_table "update_prepaid", force: :cascade do |t|
-    t.string "customer_id"
     t.string "order_id"
-    t.string "title"
+    t.string "transaction_id"
+    t.string "charge_status"
+    t.string "payment_processor"
+    t.integer "address_is_active"
+    t.string "status"
+    t.string "order_type"
+    t.string "charge_id"
+    t.string "address_id"
+    t.string "shopify_id"
+    t.string "shopify_order_id"
+    t.string "shopify_cart_token"
+    t.datetime "shipping_date"
     t.datetime "scheduled_at"
-    t.boolean "is_updated", default: false
+    t.datetime "shipped_date"
+    t.datetime "processed_at"
+    t.string "customer_id"
+    t.string "first_name"
+    t.string "last_name"
+    t.integer "is_prepaid"
+    t.datetime "created_at"
     t.datetime "updated_at"
-    t.text "properties"
+    t.string "email"
+    t.jsonb "line_items"
+    t.decimal "total_price", precision: 10, scale: 2
+    t.jsonb "shipping_address"
+    t.jsonb "billing_address"
+    t.datetime "synced_at"
+    t.boolean "is_updated", default: false
   end
 
   create_table "update_prepaid_config", force: :cascade do |t|

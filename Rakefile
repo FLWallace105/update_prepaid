@@ -1,8 +1,11 @@
 require 'dotenv'
 Dotenv.load
 require 'active_record'
+require 'resque'
+require 'resque/tasks'
 require 'sinatra/activerecord/rake'
 require_relative 'update_three_months'
+
 
 namespace :order_update do
 desc 'Fix a Three Month Order'
@@ -26,6 +29,24 @@ end
 desc 'Update all prepaid orders'
 task :update_all_prepaid do |t|
     FixThreeMonths::ChangeThreeMonths.new.update_prepaid_orders
+end
+
+desc 'Update all prepaid orders in background task'
+task :background_all_prepaid do |t|
+    FixThreeMonths::ChangeThreeMonths.new.background_update_prepaid_orders
+end
+
+desc 'Examine a specific order'
+task :examine_single_order, :order_id do |t, args|
+    order_id = args['order_id']
+    FixThreeMonths::ChangeThreeMonths.new.examine_order(order_id)
+end
+
+
+desc 'Update a specfic order non background'
+task :update_specific_order, :order_id do |t, args|
+    order_id = args['order_id']
+    FixThreeMonths::ChangeThreeMonths.new.update_line_items_order(order_id)
 end
 
 end

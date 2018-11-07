@@ -10,7 +10,11 @@ class Order < ActiveRecord::Base
 
 end
 
-class UpdatePrepaid < ActiveRecord::Base
+class UpdatePrepaidOrder < ActiveRecord::Base
+  self.table_name = "update_prepaid"
+end
+
+class FunkyStuff < ActiveRecord::Base
   self.table_name = "update_prepaid"
 end
 
