@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181023162058) do
+ActiveRecord::Schema.define(version: 20181026201204) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -28,17 +28,6 @@ ActiveRecord::Schema.define(version: 20181023162058) do
     t.string "subscription_id"
     t.boolean "updated", default: false
     t.datetime "updated_at"
-  end
-
-  create_table "bad_prices", force: :cascade do |t|
-    t.string "bad_product_title"
-    t.string "bad_shopify_product_id"
-    t.string "bad_price"
-    t.string "good_product_title"
-    t.string "good_shopify_product_id"
-    t.string "good_shopify_variant_id"
-    t.string "good_sku"
-    t.string "good_product_collection"
   end
 
   create_table "bad_recurring_subs", force: :cascade do |t|
@@ -63,32 +52,6 @@ ActiveRecord::Schema.define(version: 20181023162058) do
     t.string "first_name", limit: 125
     t.string "last_name", limit: 125
     t.string "email", limit: 125
-  end
-
-  create_table "bad_switches", force: :cascade do |t|
-    t.string "subscription_id"
-    t.string "address_id"
-    t.string "customer_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.datetime "next_charge_scheduled_at"
-    t.datetime "cancelled_at"
-    t.string "product_title"
-    t.decimal "price", precision: 10, scale: 2
-    t.integer "quantity"
-    t.string "status"
-    t.string "shopify_product_id"
-    t.string "shopify_variant_id"
-    t.string "sku"
-    t.string "order_interval_unit"
-    t.integer "order_interval_frequency"
-    t.integer "charge_interval_frequency"
-    t.integer "order_day_of_month"
-    t.integer "order_day_of_week"
-    t.jsonb "raw_line_item_properties"
-    t.datetime "synced_at"
-    t.integer "expire_after_specific_number_charges"
-    t.boolean "is_updated", default: false
   end
 
   create_table "charge_billing_address", force: :cascade do |t|
@@ -207,13 +170,6 @@ ActiveRecord::Schema.define(version: 20181023162058) do
     t.datetime "updated_at", default: -> { "now()" }, null: false
   end
 
-  create_table "correct_prices", force: :cascade do |t|
-    t.string "product_name"
-    t.string "shopify_product_id"
-    t.decimal "good_price", precision: 10, scale: 2
-    t.string "product_collection"
-  end
-
   create_table "current_products", force: :cascade do |t|
     t.string "prod_id_key"
     t.string "prod_id_value"
@@ -228,6 +184,26 @@ ActiveRecord::Schema.define(version: 20181023162058) do
     t.string "subscription_id"
     t.index ["shopify_id"], name: "index_customer_info_on_shopify_id"
     t.index ["subscription_id"], name: "index_customer_info_on_subscription_id"
+  end
+
+  create_table "customer_tag_subscriptions", force: :cascade do |t|
+    t.string "subscription_id"
+    t.string "customer_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.datetime "next_charge_scheduled_at"
+    t.datetime "cancelled_at"
+    t.string "product_title"
+    t.decimal "price", precision: 10, scale: 2
+    t.integer "quantity"
+    t.string "status"
+    t.string "shopify_product_id"
+    t.string "shopify_variant_id"
+    t.string "sku"
+    t.string "shopify_customer_id"
+    t.string "shopify_tags"
+    t.datetime "tag_updated_at"
+    t.boolean "is_tag_updated", default: false
   end
 
   create_table "customers", force: :cascade do |t|
@@ -250,37 +226,8 @@ ActiveRecord::Schema.define(version: 20181023162058) do
     t.string "processor_type"
     t.string "status"
     t.datetime "synced_at"
-    t.index ["customer_id"], name: "cust_constraint", unique: true
     t.index ["customer_id"], name: "index_customers_on_customer_id"
     t.index ["shopify_customer_id"], name: "index_customers_on_shopify_customer_id"
-  end
-
-  create_table "ellie_bottle_orders", force: :cascade do |t|
-    t.string "email"
-    t.string "first_name"
-    t.string "last_name"
-    t.string "address1"
-    t.string "address2"
-    t.string "city"
-    t.string "zip"
-    t.string "province"
-    t.string "province_code"
-    t.string "country"
-    t.string "country_code"
-    t.string "phone"
-    t.bigint "shopify_customer_id"
-    t.bigint "shopify_address_id"
-    t.boolean "order_sent", default: false
-    t.datetime "order_date"
-  end
-
-  create_table "fix_bad_sub_properties", force: :cascade do |t|
-    t.string "subscription_id"
-    t.jsonb "raw_line_item_properties"
-    t.jsonb "new_line_item_properties"
-    t.boolean "updateable", default: false
-    t.boolean "is_updated", default: false
-    t.datetime "updated_at"
   end
 
   create_table "fix_three_months", force: :cascade do |t|
@@ -296,6 +243,28 @@ ActiveRecord::Schema.define(version: 20181023162058) do
     t.jsonb "line_item_properties"
     t.boolean "updated", default: false
     t.datetime "updated_at"
+  end
+
+  create_table "influencer_one_item_persons", force: :cascade do |t|
+    t.string "first_name"
+    t.string "last_name"
+  end
+
+  create_table "main_influencers", force: :cascade do |t|
+    t.string "first_name"
+    t.string "last_name"
+    t.string "address1"
+    t.string "address2"
+    t.string "city"
+    t.string "state"
+    t.string "zip"
+    t.string "email"
+    t.string "phone"
+    t.string "bra_size"
+    t.string "top_size"
+    t.string "bottom_size"
+    t.string "sports_jacket_size"
+    t.string "collection_id"
   end
 
   create_table "matching_products", force: :cascade do |t|
@@ -326,7 +295,6 @@ ActiveRecord::Schema.define(version: 20181023162058) do
     t.string "company"
     t.string "phone"
     t.index ["order_id"], name: "index_order_billing_address_on_order_id"
-    t.index ["order_id"], name: "ord_bill", unique: true
   end
 
   create_table "order_line_items_fixed", force: :cascade do |t|
@@ -339,7 +307,6 @@ ActiveRecord::Schema.define(version: 20181023162058) do
     t.string "shopify_product_id"
     t.string "product_title"
     t.index ["order_id"], name: "index_order_line_items_fixed_on_order_id"
-    t.index ["order_id"], name: "ord_fixed", unique: true
     t.index ["subscription_id"], name: "index_order_line_items_fixed_on_subscription_id"
   end
 
@@ -363,7 +330,6 @@ ActiveRecord::Schema.define(version: 20181023162058) do
     t.string "company"
     t.string "phone"
     t.index ["order_id"], name: "index_order_shipping_address_on_order_id"
-    t.index ["order_id"], name: "ord_ship", unique: true
   end
 
   create_table "orders", force: :cascade do |t|
@@ -400,7 +366,6 @@ ActiveRecord::Schema.define(version: 20181023162058) do
     t.index ["charge_id"], name: "index_orders_on_charge_id"
     t.index ["customer_id"], name: "index_orders_on_customer_id"
     t.index ["order_id"], name: "index_orders_on_order_id"
-    t.index ["order_id"], name: "ord_id", unique: true
     t.index ["shopify_id"], name: "index_orders_on_shopify_id"
     t.index ["shopify_order_id"], name: "index_orders_on_shopify_order_id"
     t.index ["shopify_order_number"], name: "index_orders_on_shopify_order_number"
@@ -443,6 +408,15 @@ ActiveRecord::Schema.define(version: 20181023162058) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "shopify_customers", force: :cascade do |t|
+    t.string "shopify_customer_id"
+    t.string "email"
+    t.string "first_name"
+    t.string "last_name"
+    t.datetime "created_at"
+    t.string "shopify_tags"
+  end
+
   create_table "skip_reasons", force: :cascade do |t|
     t.string "customer_id", null: false
     t.string "shopify_customer_id", null: false
@@ -473,6 +447,27 @@ ActiveRecord::Schema.define(version: 20181023162058) do
     t.string "size"
     t.string "sku"
     t.index ["product_id"], name: "index_sku_sizes_on_product_id"
+  end
+
+  create_table "staging_next_month", force: :cascade do |t|
+    t.integer "sub_type"
+    t.string "product_title"
+    t.string "shopify_product_id"
+    t.string "shopify_variant_id"
+    t.string "sku"
+    t.string "product_collection"
+  end
+
+  create_table "staging_subscriptions_update", force: :cascade do |t|
+    t.string "subscription_id"
+    t.string "product_title"
+    t.decimal "price", precision: 10, scale: 2
+    t.string "shopify_product_id"
+    t.string "shopify_variant_id"
+    t.string "sku"
+    t.jsonb "raw_line_item_properties"
+    t.boolean "is_updated", default: false
+    t.datetime "updated_at"
   end
 
   create_table "sub_line_items", force: :cascade do |t|
@@ -579,6 +574,7 @@ ActiveRecord::Schema.define(version: 20181023162058) do
     t.jsonb "shipping_address"
     t.jsonb "billing_address"
     t.datetime "synced_at"
+    t.datetime "script_updated_at"
     t.boolean "is_updated", default: false
   end
 

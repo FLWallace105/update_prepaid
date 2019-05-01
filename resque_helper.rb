@@ -56,6 +56,8 @@ module ResqueHelper
             my_properties.each do |myp|
                 puts myp.inspect
             end
+            found_sports_jacket = false
+            sports_bra_size = ""
             found_collection = false
             my_properties.map do |mystuff|
                 # puts "#{key}, #{value}"
@@ -63,12 +65,25 @@ module ResqueHelper
                     mystuff['value'] = my_product_collection
                     found_collection = true
                 end
+                if mystuff['name'] == "sports-jacket"
+                    found_sports_jacket = true
+                end
+                if mystuff['name'] == "sports-bra"
+                    sports_bra_size = mystuff['value']
+                    #puts "ATTENTION -- Sports BRa SIZE = #{sports_bra_size}"
+                end
             end
             if found_collection == false
                 # only if I did not find the product_collection property in the line items do I need to add it
                 puts "We are adding the product collection to the line item properties"
                 my_properties << { "name" => "product_collection", "value" => my_product_collection }
             end
+            if found_sports_jacket == false
+                puts "We are adding the sports-bra size for the sports-jacket size"
+                my_line_items << { "name" => "sports-jacket", "value" => sports_bra_size}
+            end
+
+
             puts "Now properties = #{my_properties.inspect}"
             puts "********"
             my_recharge_line_items = my_properties
